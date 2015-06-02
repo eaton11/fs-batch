@@ -14,6 +14,8 @@
 # fs-batch
 Reads files asynchronously and groups the results into a single response.
 
+Fs-batch aims at making it easier to work with asynchronous file reading in Node. You can specify an array of paths to read, and fs-batch will read all of them asynchronously, and then when each file has been read, it returns an array of results for you.
+
 *Example*
 ```javascript
 var fsb = require('fs-batch');
@@ -23,7 +25,20 @@ fsb.readFiles(["path/to/file1", "file2", "path/file3"])
 })
 ```
 
-<br>
+####How is this better than promises?  
+With promises, you can read files asynchronously, but only one at a time. Here is how a typical promise file reading goes:  
+*NOT an example of fs-batch*
+```javascript
+promiseFs.readFile.("path/to/file1")
+.then(function () { // won't run until file1 is read
+    return promiseFs.readFile("file2");
+})
+.then(function () { // won't run until file1 AND file2 are read
+    return promiseFs.readFile("file3");
+})
+//etc.
+```
+Unlike this example of a promise based library, fs-batch will read all of the files independently of eachother and then when they have all been read (or errored) then fs-batch will return them all.
 
 ####Response Methods
 - `success()` - return an array of succesfully found files
