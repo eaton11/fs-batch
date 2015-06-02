@@ -24,6 +24,11 @@ server.listen(8000);
 var fsb = require("./fs-batch");
 
 fsb().readFiles(["cats.json", "dogs.json", "pigs.json"])
+.success(function(files){
+	files.each(function(file){
+		console.log(file);
+	})
+});
 // .success(function(files){
 // 	files.each(function(file){
 // 		console.log(file);

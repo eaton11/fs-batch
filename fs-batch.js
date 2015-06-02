@@ -14,12 +14,12 @@ var helpers = {
 			send: null,
 			receive: null
 		};
-
 		if(newFileQuery.action === "write"){
 			newFileQuery.send = _SEND_DATA;
 		}
 		self.queue.push(newFileQuery);
 	},
+
 	getMultiFiles: function(_ARR, _ACTION){
 		var self = helpers;
 		for(var i = 0, ii = _ARR.length; i < ii; i++){
@@ -28,11 +28,6 @@ var helpers = {
 		self.readQueue(); //* left here
 	},
 
-	dataReturned: function(){
-		utils.dataAll.each = utils.dataError.each = function(s){
-			for(var t=this,e=0,n=t.length;n>e;e++)s(t[e],e,t)
-		};
-	},
 	readQueue: function(){
 		var self = helpers;
 		for (var i = 0, ii = self.queue.length; i<ii; i++) {
@@ -40,10 +35,13 @@ var helpers = {
 				self.readFile(self.queue[i], self.queue, i);
 			} 
 		}
+		self.dataAll.each = self.dataError.each = self.dataSuccess.each = function(s){
+			for(var t=this,e=0,n=t.length;n>e;e++)s(t[e],e,t)
+		};
 	},
+
 	readFile: function(_FILE_OBJ, _FILE_QUEUE_ARRAY, _INDEX){
 		var self = helpers;
-		// console.log(_FILE_OBJ);
 		var fileObject = {
 			query: _FILE_OBJ.path
 		};
@@ -52,31 +50,19 @@ var helpers = {
 				fileObject.error = err;
 				self.dataAll.push(fileObject);
 				self.dataError.push(fileObject);
-				// console.log("err: ", err);
 			} else {
 				fileObject.data = data;
 				self.dataAll.push(fileObject);
 				self.dataSuccess.push(fileObject);
-				// console.log("data: ", data)
 			}
-			
-			console.log("self.dataSuccess.length:\t",self.dataSuccess.length);
-			console.log("self.dataError.length:    \t",self.dataError.length);
-			console.log("");
-			console.log("self.dataAll.length:    \t",self.dataAll.length);
-			console.log("self.queue.length:      \t",self.queue.length);
 			if(self.queue.length === self.dataAll.length){
-				console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\tMATCH")
+					fsb.utils.onSuccess(self.dataSuccess);
+					fsb.utils.onError(self.dataSuccess);
+					self.queue = self.dataAll = self.dataSuccess = self.dataError = [];
 			}
-			console.log("");
-			console.log("-----------------------------");
-
-			// self.dataAll.push()
-		})
+		});
 	},
-	fileQuery: function(){
 
-	},
 	queue: [],
 	dataAll: [],
 	dataSuccess: [],
@@ -85,7 +71,6 @@ var helpers = {
 
 
 var fsb = {
-
 	readFiles: function(fd){
 		switch(helpers.inputType(fd)){
 			case "array":
@@ -100,7 +85,22 @@ var fsb = {
 				return;
 				break;
 		}
-
+		return fsb;
+	},
+	readFiles: function(fd){
+		switch(helpers.inputType(fd)){
+			case "array":
+				helpers.getMultiFiles(fd, "read");
+				break;
+			case "string":
+				console.log("fs-batch: string != array of strings");
+				return;
+				break;
+			default:
+				console.log("fs-batch: must pass array of strings");
+				return;
+				break;
+		}
 		return fsb;
 	},
 
