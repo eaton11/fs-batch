@@ -14,6 +14,8 @@
 # fs-batch
 Reads files asynchronously and groups the results into a single response.
 
+(*still buggy, not production ready*)
+
 Fs-batch aims at making it easier to work with asynchronous file reading in Node. You can specify an array of paths to read, and fs-batch will read all of them asynchronously, and then when each file has been read, it returns an array of results for you.
 
 *Example*
